@@ -8,6 +8,8 @@
   python geo_client.py check https://example.com --no-seo      # 只要 GEO
   python geo_client.py check https://example.com --seo-only    # 只要 SEO
   python geo_client.py mention 你的品牌名 商用清洁机器人             # 免登录!拿品牌去问 AI,贴回原话
+  python geo_client.py wallet                                  # 看余额(花钱前先看)
+  python geo_client.py topup 100                               # 充值:拿付款要求
   python geo_client.py industry                                # 免登录!已建库的行业清单
   python geo_client.py industry 商用清洁机器人                  # 免登录!该行业 AI 里谁是 TOP1
   python geo_client.py chat "今天投放效果怎么样?"
@@ -77,6 +79,7 @@ def _explain_http(e: urllib.error.HTTPError) -> str:
         body = ""
     hint = {
         401: "token 无效 / 过期 / 已禁用 —— 联系 Vigilath 重发,别重试刷接口。",
+        402: "余额不足 —— 这是付费能力。用 `wallet` 看余额、`topup <金额>` 充值;响应里通常带了还需要多少与充值方式,如实转达,别重试刷接口。",
         403: "无权限(能力未授权,或 Origin 不在白名单)。",
         429: "账号配额 / 限速,稍后退避重试。",
     }.get(e.code, "")
@@ -278,6 +281,48 @@ def mention(brand: str, industry_terms: list, wait: bool = True) -> dict:
             "note": f"等超时了。稍后用 `mention-status {task_id}` 再查,任务还在跑。"}
 
 
+def wallet() -> dict:
+    """看余额。**花钱的动作之前先看一眼** —— 余额不够时早说,别让用户等到失败。"""
+    return get("wallet")
+
+
+def topup(amount_yuan: str, tx_hash: str = "") -> dict:
+    """充值。两步:先拿付款要求(402),链上付完再带 tx_hash 回来核销。
+
+    没有 tx_hash 时返回的是「怎么付」;**把里面的金额、收款地址、网络原样念给用户**,
+    别自己编。用户也可以选择去网页充值,地址在返回的 web 字段里。
+    """
+    try:
+        cents = int(round(float(amount_yuan) * 100))
+    except ValueError:
+        _die(f"充值金额要是数字(元),收到:{amount_yuan!r}")
+    headers = {"Content-Type": "application/json"}
+    if tx_hash:
+        import base64 as _b64
+
+        headers["X-PAYMENT"] = _b64.b64encode(
+            json.dumps({"tx_hash": tx_hash}).encode("utf-8")
+        ).decode("ascii")
+    req = urllib.request.Request(
+        f"{BASE}/wallet/topup",
+        data=json.dumps({"amount_cents": cents}).encode("utf-8"),
+        headers={**headers, "Authorization": _headers()["Authorization"]},
+        method="POST",
+    )
+    try:
+        with _request(req, timeout=60) as resp:
+            return json.loads(resp.read().decode("utf-8"))
+    except urllib.error.HTTPError as e:
+        if e.code == 402:
+            # 402 是这条流程的**正常一步**,不是错误:它带着付款要求
+            body = json.loads(e.read().decode("utf-8", "ignore") or "{}")
+            body["_hint"] = ("这不是失败 —— 按 accepts 里的网络/资产/收款地址/金额付款,"
+                             "拿到交易哈希后重跑:topup <金额> --tx <哈希>。"
+                             "或者引导用户到 web 字段给的页面用微信充值。")
+            return body
+        raise
+
+
 def login() -> "None":
     """设备码授权:终端出配对码,人在浏览器批准,拿到的 token 写回 ~/.vigilath/config。
 
@@ -349,7 +394,7 @@ def login() -> "None":
 def main(argv: list) -> "None":
     if len(argv) < 2:
         _die('用法:geo_client.py check <网址> | mention <品牌> <行业词> | industry [行业名] | '
-             'chat "问题" | data <name> | capabilities | login')
+             'chat "问题" | data <name> | wallet | topup <金额> | capabilities | login')
     cmd = argv[1]
     if cmd == "chat":
         if len(argv) < 3:
@@ -388,6 +433,16 @@ def main(argv: list) -> "None":
         req = urllib.request.Request(f"{SITE_API}/check/mention/{argv[2]}")
         with _request(req, timeout=30) as resp:
             print(resp.read().decode("utf-8"))
+    elif cmd == "wallet":
+        print(json.dumps(wallet(), ensure_ascii=False, indent=2))
+    elif cmd == "topup":
+        if len(argv) < 3:
+            _die("topup 需要金额(元),如:topup 100;付款后核销:topup 100 --tx 0x…")
+        tx = ""
+        if "--tx" in argv:
+            i = argv.index("--tx")
+            tx = argv[i + 1] if len(argv) > i + 1 else ""
+        print(json.dumps(topup(argv[2], tx), ensure_ascii=False, indent=2))
     elif cmd == "industry":
         print(json.dumps(industry(argv[2] if len(argv) > 2 else ""), ensure_ascii=False, indent=2))
     elif cmd == "capabilities":
@@ -395,7 +450,7 @@ def main(argv: list) -> "None":
     elif cmd == "login":
         login()
     else:
-        _die(f"未知命令:{cmd}(支持 check / mention / industry / chat / data / capabilities / login)")
+        _die(f"未知命令:{cmd}(支持 check / mention / industry / chat / data / wallet / topup / capabilities / login)")
 
 
 if __name__ == "__main__":
