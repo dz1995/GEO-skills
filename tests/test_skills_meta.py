@@ -75,6 +75,24 @@ class StructureTest(unittest.TestCase):
                 with self.subTest(skill=md.parent.name, cmd=c):
                     self.assertIn(c, known, f"SKILL.md 写了不存在的命令 {c!r}")
 
+    def test_skillhub_发布字段齐全(self):
+        """SkillHub 发布要求 slug / version(SemVer) / displayName —— 缺一个 publish 直接失败。
+
+        Claude 与 OpenClaw 只认 name + description,多出来的字段它们会忽略,
+        所以一份 SKILL.md 能同时满足三个平台。别为了迁就某一家把 name 改掉。
+        """
+        semver = re.compile(r"^\d+\.\d+\.\d+(?:[-+].+)?$")
+        slug_pat = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
+        for md in SKILLS:
+            with self.subTest(skill=md.parent.name):
+                fm = frontmatter(md)
+                self.assertEqual(fm.get("slug"), md.parent.name, "slug 必须等于目录名")
+                self.assertTrue(slug_pat.match(fm.get("slug", "")), "slug 必须是 kebab-case")
+                self.assertTrue(semver.match(fm.get("version", "")), f"version 不是 SemVer: {fm.get('version')}")
+                self.assertTrue((fm.get("displayName") or "").strip(), "缺 displayName")
+                self.assertTrue((fm.get("summary") or "").strip(), "缺 summary(商店列表页展示这句)")
+                self.assertLessEqual(len(fm.get("summary", "")), 120, "summary 太长,列表页会截断")
+
     def test_没有内部信息泄漏(self):
         """这些文件会进公开仓库 —— 内网地址、内部服务名、凭证样式都不能有。"""
         bad = re.compile(r"127\.0\.0\.1|localhost|172\.80|123\.125|/opt/geo|ec2-|"

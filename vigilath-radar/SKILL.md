@@ -1,6 +1,13 @@
 ---
 name: vigilath-radar
 description: 你的客户会怎么问 AI,而你在哪些问题上根本不存在——一次扩出 40 条真实提问,标出你完全没出现的那些。当用户问「客户会怎么搜我 / 用户会问 AI 什么 / 我该盯哪些问题 / 哪些提问我没覆盖 / 帮我找关键词」时使用。看候选词免费;把词变成持续跟踪要收费。
+slug: vigilath-radar
+version: 1.0.0
+displayName: 提问词雷达
+summary: 你的客户会怎么问 AI,而你在哪些问题上根本不存在
+tags: [GEO, AI搜索, 关键词, 选词]
+license: Apache-2.0
+homepage: https://github.com/dz1995/GEO-skills
 ---
 
 # 提问词雷达

@@ -1,6 +1,13 @@
 ---
 name: vigilath-geo
 description: 检测、查询与优化品牌在 AI 搜索引擎(ChatGPT / Perplexity / DeepSeek / 豆包 / 通义 / 文心 / 元宝)中的可见性与被引用率(GEO/AEO),并可查品牌舆情与热点。**任何网站的 GEO / SEO 体检不需要登录、免费、不限次**——用户说「测一下这个网站 / 这个站 GEO 怎么样 / SEO 分数多少 / 帮我体检一下官网」就直接跑 check。另有需授权的能力:当用户问到「在 AI 里被搜到几个 / AI 搜索可见性 / GEO / AEO / 竞品在 AI 里怎么对比 / 怎么提升被 AI 引用 / 投放效果 / 露出率 / 日报周报月报」,或问到「今天有没有负面 / 舆情 / 品牌声量 / 有什么热点可蹭 / 调监测词」这类问题时使用。
+slug: vigilath-geo
+version: 1.0.0
+displayName: Vigilath GEO 全能包
+summary: 检测·查询·优化品牌在 AI 搜索引擎中的可见性(八种场景一个包)
+tags: [GEO, AI搜索, SEO, 舆情, 内容生成]
+license: Apache-2.0
+homepage: https://github.com/dz1995/GEO-skills
 ---
 
 # Vigilath GEO 优化

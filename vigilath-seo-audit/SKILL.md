@@ -1,6 +1,13 @@
 ---
 name: vigilath-seo-audit
 description: 传统搜索引擎那套,你还没做对的 12 项——SEO 逐类评分 + 独立 0-100 分。免登录、免费、不限次,30 秒出结果。当用户给出网址并问「SEO 怎么样 / 我的 SEO 分数 / 搜索引擎优化做得好不好 / title 和 meta 有没有问题 / 网站标题标签对不对」时使用。**只管传统 SEO**;要问 AI 爬虫读不读得懂用 vigilath-site-audit,两个分数各算各的、绝不合并。
+slug: vigilath-seo-audit
+version: 1.0.0
+displayName: 传统 SEO 体检
+summary: 搜索引擎那套你还没做对的 12 项,独立评分,免登录不限次
+tags: [SEO, 网站检测, 免登录]
+license: Apache-2.0
+homepage: https://github.com/dz1995/GEO-skills
 ---
 
 # 传统 SEO 体检

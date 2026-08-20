@@ -1,6 +1,13 @@
 ---
 name: vigilath-weekly
 description: 每周告诉你在 AI 搜索里涨了还是跌了——六项固定指标 + 环比 + 达标判定,日报周报月报都能取。当用户问「这周怎么样 / 数据涨了吗 / 最近表现如何 / 露出率多少 / 达标了吗 / 上个月的报告」时使用。需要授权,且账号得已经在跑监测。
+slug: vigilath-weekly
+version: 1.0.0
+displayName: AI 可见性周报
+summary: 每周告诉你在 AI 搜索里涨了还是跌了,六项指标 + 环比 + 达标
+tags: [GEO, AI搜索, 数据报告, 监测]
+license: Apache-2.0
+homepage: https://github.com/dz1995/GEO-skills
 ---
 
 # AI 可见性周报
