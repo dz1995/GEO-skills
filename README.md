@@ -76,6 +76,22 @@ git clone https://github.com/dz1995/GEO-skills.git && cd GEO-skills
 bash vigilath-geo/install.sh --dir ~/.openclaw/skills
 ```
 
+## 测试
+
+零依赖,只要 `python3` 和 `bash`:
+
+```bash
+bash tests/run.sh
+```
+
+| 文件 | 测什么 |
+|---|---|
+| `tests/test_geo_client.py` | 客户端 15 项:凭证读写、设备标识不冲掉已有 token、**免登录命令不带 Authorization**、402 当成付款要求而非错误、金额换算、命令分发 |
+| `tests/test_skills_meta.py` | 技能包 7 项:frontmatter 的 name 与目录名一致、描述含触发语、SKILL.md 里写的命令客户端真的有、**零三方依赖**、无内部信息 |
+| `tests/test_install.sh` | 安装 7 项:装到哪、`--skills` 选装、错误技能名跳过不中断、**在源码仓库里跑不污染源码目录**、凭证权限 600 |
+
+每次 push 由 GitHub Actions 自动跑(`.github/workflows/test.yml`)。CI 里**刻意不装任何依赖** —— 一旦需要 `pip install`,说明零依赖这个承诺已经被破坏了。
+
 ## 共享客户端
 
 客户端只有一份源:`vigilath-geo/scripts/geo_client.py`,安装时复制进每个技能目录 —— 各技能自带副本是 skill 规范要求的自包含,但源只有一份,不会各自漂移。
